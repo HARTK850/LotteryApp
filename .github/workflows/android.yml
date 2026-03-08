@@ -1,4 +1,4 @@
-name: Build APK without Wrapper
+name: Build APK (No Wrapper Needed)
 
 on:
   push:
@@ -20,17 +20,21 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    - name: Setup Android SDK
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v4
+      with:
+        gradle-version: 8.2  # גרסה תואמת ל-AGP 8.2.0 מה-build.gradle שלך
+
+    - name: Install Android SDK components
       uses: android-actions/setup-android@v3
 
-    - name: Install required SDK components
+    - name: Accept SDK licenses and install platforms
       run: |
         yes | sdkmanager --licenses
-        sdkmanager "platforms;android-34" "build-tools;34.0.0" "platform-tools" "platforms;android-19"
+        sdkmanager "platforms;android-34" "build-tools;34.0.0" "platforms;android-19" "platform-tools"
 
-    - name: Build with Gradle (direct, no wrapper)
-      run: |
-        gradle --init-script init.gradle assembleDebug --stacktrace --no-daemon
+    - name: Build Debug APK
+      run: gradle assembleDebug --stacktrace --no-daemon
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
