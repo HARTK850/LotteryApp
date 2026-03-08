@@ -1,9 +1,7 @@
-name: Build APK
+name: Build APK - Simple
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
     branches: [ main ]
 
 jobs:
@@ -11,33 +9,30 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
+    - uses: actions/checkout@v4
 
-    - name: Set up JDK 17
+    - name: set up JDK 11  # ← JDK 11 יציב עם AGP 7.4
       uses: actions/setup-java@v4
       with:
-        java-version: '17'
+        java-version: '11'
         distribution: 'temurin'
-
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
-      with:
-        gradle-version: 8.0   # ← שנה ל-8.0 (מתאים יותר ל-AGP 8.1)
 
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Install SDK platforms
+    - name: Accept licenses + install old + new platforms
       run: |
         yes | sdkmanager --licenses
-        sdkmanager "platforms;android-33" "build-tools;33.0.2" "platforms;android-19"
+        sdkmanager --update
+        sdkmanager "platforms;android-19" "platforms;android-33" "build-tools;33.0.2" "platform-tools"
 
     - name: Build APK
-      run: gradle assembleDebug --stacktrace --no-daemon --refresh-dependencies
+      run: |
+        chmod +x ./gradlew || true  # אם יש wrapper – לא נכשל
+        ./gradlew assembleDebug --stacktrace || gradle :app:assembleDebug --stacktrace --no-daemon
 
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: lottery-app-apk
-        path: app/build/outputs/apk/debug/app-debug.apk
+        name: app-apk
+        path: app/build/outputs/apk/debug/*.apk
