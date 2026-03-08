@@ -1,4 +1,4 @@
-name: Build APK (No Wrapper Needed)
+name: Build APK
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v4
 
     - name: Set up JDK 17
@@ -23,20 +23,20 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
-        gradle-version: 8.2  # גרסה תואמת ל-AGP 8.2.0 מה-build.gradle שלך
+        gradle-version: 8.0   # ← שנה ל-8.0 (מתאים יותר ל-AGP 8.1)
 
-    - name: Install Android SDK components
+    - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
-    - name: Accept SDK licenses and install platforms
+    - name: Install SDK platforms
       run: |
         yes | sdkmanager --licenses
-        sdkmanager "platforms;android-34" "build-tools;34.0.0" "platforms;android-19" "platform-tools"
+        sdkmanager "platforms;android-33" "build-tools;33.0.2" "platforms;android-19"
 
-    - name: Build Debug APK
-      run: gradle assembleDebug --stacktrace --no-daemon
+    - name: Build APK
+      run: gradle assembleDebug --stacktrace --no-daemon --refresh-dependencies
 
-    - name: Upload APK Artifact
+    - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
         name: lottery-app-apk
