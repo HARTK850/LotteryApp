@@ -4,8 +4,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:8.1.4"   // ← שנה ל-8.1.4 (יציבה)
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10"  // ← יציבה
+        classpath "com.android.tools.build:gradle:7.4.2"  // ← יציב מאוד עם minSdk 19
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.20"
     }
 }
 
@@ -14,4 +14,7 @@ allprojects {
         google()
         mavenCentral()
     }
+}
+task clean(type: Delete) {
+    delete rootProject.buildDir
 }
